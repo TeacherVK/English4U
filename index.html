@@ -7,90 +7,65 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js for graphs and jsPDF for certificates -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #eef2f7; /* Light blue-gray background */
         }
-        .logo-text {
-            font-weight: 700;
-            color: #1a202c;
+        .neumorphism-inset {
+            box-shadow: inset 5px 5px 10px #d8dde2, inset -5px -5px 10px #ffffff;
         }
-        .progress-bar-fill {
+        .neumorphism-outset {
+            background: linear-gradient(145deg, #f8fcff, #e4e8ec);
+            box-shadow: 7px 7px 15px #c8cdd2, -7px -7px 15px #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .neumorphism-outset:active {
+            box-shadow: inset 7px 7px 15px #c8cdd2, inset -7px -7px 15px #ffffff;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .progress-bar-xp {
+            background-color: #d1d9e6;
+            border-radius: 9999px;
+            padding: 2px;
+        }
+        .progress-bar-xp-fill {
+            background: linear-gradient(90deg, #8e2de2, #4a00e0);
             transition: width 0.5s ease-in-out;
-        }
-        .level-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .level-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .locked {
-            filter: grayscale(1);
-            cursor: not-allowed;
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.5);
         }
         .modal-backdrop {
             background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
         }
         .spinner {
-            border-top-color: #3498db;
+            border-top-color: #6d28d9;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* --- New Design & Gamification Styles --- */
-        .tab-btn {
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
         .tab-btn.active {
-            border-bottom-color: #f59e0b;
-            color: #1e293b;
-            font-weight: 600;
-        }
-        details summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            background-color: #f8fafc;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        details summary:hover {
-            background-color: #f1f5f9;
+            background-color: #6d28d9;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         details summary::after {
-            content: '▼';
-            font-size: 0.8em;
+            content: '+';
+            font-size: 1.5em;
             transition: transform 0.3s ease;
+            font-weight: 300;
         }
         details[open] summary::after {
-            transform: rotate(180deg);
-        }
-        .ai-container {
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-            background: linear-gradient(145deg, #ffffff, #f9fafb);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .ai-container h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.75rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            transform: rotate(45deg);
         }
         .correct-answer {
             background-color: #dcfce7 !important;
@@ -108,39 +83,22 @@
             border-color: #ef4444 !important;
             box-shadow: 0 0 0 2px #fca5a5;
         }
-        .proofreading-word {
-            cursor: pointer;
-            border-bottom: 2px dotted transparent;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .proofreading-word:hover {
-            background-color: #fef9c3;
-        }
         .proofreading-word.selected {
             background-color: #fde68a;
             border-bottom-color: #f59e0b;
         }
+        .listen-btn:hover {
+            transform: scale(1.1);
+        }
 
-
-        /* --- New Animated Logo --- */
-        .animated-logo .sun-glow {
-            animation: sun-pulse 2s infinite ease-in-out;
-        }
-        .animated-logo .energy-ray {
-            stroke-dasharray: 100;
-            stroke-dashoffset: 100;
-            animation: draw-ray 2s infinite ease-in-out;
-        }
-        @keyframes sun-pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-        @keyframes draw-ray {
-            0% { stroke-dashoffset: 100; }
-            40% { stroke-dashoffset: 0; }
-            80% { stroke-dashoffset: -100; }
-            100% { stroke-dashoffset: -100; }
-        }
+        .animated-logo .sun-glow { animation: sun-pulse 2s infinite ease-in-out; }
+        .animated-logo .energy-ray { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw-ray 2s infinite ease-in-out; }
+        @keyframes sun-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes draw-ray { 0% { stroke-dashoffset: 100; } 40% { stroke-dashoffset: 0; } 80% { stroke-dashoffset: -100; } 100% { stroke-dashoffset: -100; } }
+        
+        .draggable { cursor: grab; }
+        .drop-target { border: 2px dashed #a7a7a7; }
+        .drop-target.over { background-color: #e0e0e0; }
     </style>
 </head>
 <body class="bg-slate-100 text-gray-800">
@@ -154,11 +112,25 @@
                 <div class="flex justify-center items-center mb-6">
                     <div class="animated-logo w-24 h-24 mr-2">
                         <svg viewBox="0 0 100 100">
-                            <defs><radialGradient id="sunGradient"><stop offset="0%" stop-color="#FFD700" /><stop offset="100%" stop-color="#FFA500" /></radialGradient></defs>
-                            <circle class="sun-glow" cx="50" cy="25" r="15" fill="url(#sunGradient)"/>
-                            <path class="energy-ray" d="M50 40 Q 50 60, 60 80" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M 35 95 L 40 70 L 60 70 L 65 95 L 55 95 L 55 85 L 45 85 L 45 95 Z" fill="#4A5568"/>
-                            <circle cx="50" cy="60" r="5" fill="#4A5568"/>
+                            <defs>
+                                <radialGradient id="sunGradient">
+                                    <stop offset="0%" stop-color="#FFD700" />
+                                    <stop offset="100%" stop-color="#FFA500" />
+                                </radialGradient>
+                            </defs>
+                            <!-- Sun -->
+                            <circle class="sun-glow" cx="50" cy="20" r="15" fill="url(#sunGradient)"/>
+                            
+                            <!-- Person Figure -->
+                            <g transform="translate(0, 10)">
+                                <!-- Head -->
+                                <circle cx="50" cy="60" r="7" fill="#4A5568"/>
+                                <!-- Body and Arms as a single powerful shape -->
+                                <path d="M50,65 C 40,70 30,80 35,95 L 65,95 C 70,80 60,70 50,65 Z" fill="#4A5568"/>
+                            </g>
+                        
+                            <!-- Energy Ray -->
+                            <path class="energy-ray" d="M50 35 Q 50 45, 50 55" stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round"/>
                         </svg>
                     </div>
                     <div>
@@ -170,6 +142,7 @@
                 <p class="text-gray-600 mb-6">Ingresa tu nombre para guardar tu progreso y empezar a aprender.</p>
                 <input type="text" id="name-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Escribe tu nombre aquí...">
                 <button id="start-btn" class="w-full mt-4 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">Continuar</button>
+                <div id="login-error-container" class="mt-4"></div>
             </div>
         </div>
         
@@ -192,16 +165,30 @@
 
         <!-- Main Dashboard -->
         <div id="main-dashboard" class="hidden">
-            <header class="bg-white p-6 rounded-2xl shadow-md mb-8">
+            <header class="bg-white p-6 rounded-2xl shadow-lg mb-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                      <div class="flex items-center mb-4 md:mb-0">
                         <div class="animated-logo w-20 h-20 mr-2">
                            <svg viewBox="0 0 100 100">
-                                <defs><radialGradient id="sunGradientH"><stop offset="0%" stop-color="#FFD700" /><stop offset="100%" stop-color="#FFA500" /></radialGradient></defs>
-                                <circle class="sun-glow" cx="50" cy="25" r="15" fill="url(#sunGradientH)"/>
-                                <path class="energy-ray" d="M50 40 Q 50 60, 60 80" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                <path d="M 35 95 L 40 70 L 60 70 L 65 95 L 55 95 L 55 85 L 45 85 L 45 95 Z" fill="#4A5568"/>
-                                <circle cx="50" cy="60" r="5" fill="#4A5568"/>
+                                <defs>
+                                    <radialGradient id="sunGradientH">
+                                        <stop offset="0%" stop-color="#FFD700" />
+                                        <stop offset="100%" stop-color="#FFA500" />
+                                    </radialGradient>
+                                </defs>
+                                <!-- Sun -->
+                                <circle class="sun-glow" cx="50" cy="20" r="15" fill="url(#sunGradientH)"/>
+                                
+                                <!-- Person Figure -->
+                                <g transform="translate(0, 10)">
+                                    <!-- Head -->
+                                    <circle cx="50" cy="60" r="7" fill="#4A5568"/>
+                                    <!-- Body and Arms as a single powerful shape -->
+                                    <path d="M50,65 C 40,70 30,80 35,95 L 65,95 C 70,80 60,70 50,65 Z" fill="#4A5568"/>
+                                </g>
+                            
+                                <!-- Energy Ray -->
+                                <path class="energy-ray" d="M50 35 Q 50 45, 50 55" stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <div>
@@ -209,9 +196,21 @@
                             <p class="text-gray-500">by Teacher V</p>
                         </div>
                     </div>
-                    <div class="text-center md:text-right">
-                        <h2 class="text-xl font-semibold" id="welcome-name"></h2>
-                        <p class="text-gray-600">Tu viaje hacia la maestría del Inglés</p>
+                    <div class="text-center md:text-right flex items-center gap-6">
+                        <div>
+                            <h2 class="text-xl font-semibold" id="welcome-name"></h2>
+                            <p class="text-gray-600">Tu viaje hacia la maestría del Inglés</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <span class="text-2xl font-bold text-orange-500" id="streak-counter">0</span>
+                                <p class="text-sm text-gray-500">Días de Racha 🔥</p>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-2xl font-bold text-purple-600" id="xp-counter">0</span>
+                                <p class="text-sm text-gray-500">Puntos XP ✨</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-6">
@@ -221,8 +220,16 @@
                     </div>
                 </div>
             </header>
+            
+            <div id="daily-challenge-container" class="mb-8 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-purple-600 to-blue-500 text-white">
+                <h3 class="text-2xl font-bold mb-2">🚀 Desafío Diario</h3>
+                <p class="mb-4 opacity-80">¡Completa la misión de hoy para ganar XP extra y mantener tu racha!</p>
+                <div id="daily-challenge-content">
+                    <!-- Daily challenge will be injected here -->
+                </div>
+            </div>
 
-            <main id="levels-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <main id="levels-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Level cards will be injected here by JavaScript -->
             </main>
         </div>
@@ -246,48 +253,72 @@
 
     <!-- Firebase -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
         
         const { jsPDF } = window.jspdf;
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        
+        // --- USER'S FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3jK2JpxBk7dkeZobeJ1qhLVpaeTLjweM",
+            authDomain: "english4u-54937.firebaseapp.com",
+            projectId: "english4u-54937",
+            storageBucket: "english4u-54937.appspot.com",
+            messagingSenderId: "240546828151",
+            appId: "1:240546828151:web:15493caa31027a93dd5b72",
+            measurementId: "G-Y0R7VZLHRQ"
+        };
+
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const analytics = getAnalytics(app);
 
-        let userData = { name: '', currentLevel: 'A1', unlockedLevels: ['A1'], levelProgress: {}, placementTestTaken: false };
+        let userData = { 
+            name: '', 
+            currentLevel: 'A1', 
+            unlockedLevels: ['A1'], 
+            levelProgress: {}, 
+            placementTestTaken: false,
+            xp: 0,
+            lastLogin: null,
+            streak: 0,
+            achievements: []
+        };
         
         // --- EXPANDED CONTENT DATABASE ---
         const contentDB = {
             'A1': {
-                title: 'A1: Principiante', color: 'bg-teal-500', description: 'Aprende lo básico para comunicarte.',
+                title: 'A1: Principiante', color: 'bg-teal-500', description: 'Aprende lo básico para comunicarte.', xpToComplete: 1000,
                 topics: { gramática: ["Verbo to be", "Presente Simple", "Artículos"], vocabulario: ["Saludos", "Números", "Familia"], proofreading: ["Errores comunes en A1"], phrasal_verbs: ["Phrasal Verbs básicos"], native_expressions: ["Expresiones cotidianas"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options: ['am', 'is', 'are'], a: 'is' }) }
             },
             'A2': {
-                title: 'A2: Elemental', color: 'bg-blue-500', description: 'Describe tu entorno y experiencias.',
+                title: 'A2: Elemental', color: 'bg-blue-500', description: 'Describe tu entorno y experiencias.', xpToComplete: 1500,
                 topics: { gramática: ["Pasado Simple", "Presente Continuo", "Futuro 'going to'"], vocabulario: ["Rutinas", "Hobbies", "Viajes"], proofreading: ["Identificar tiempo verbal incorrecto"], phrasal_verbs: ["Verbos con 'get' y 'go'"], native_expressions: ["Frases para socializar"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
             },
             'B1': {
-                title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.',
-                topics: { grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], vocabulary: ["Work", "Education", "Health"], proofreading: ["Punctuation and prepositions"], phrasal_verbs: ["Verbs for travel and work"], native_expressions: ["Common idioms"] },
+                title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.', xpToComplete: 2000,
+                topics: { grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], vocabulary: ["Work", "Education", "Health"], writing_lab: ["Writing an informal email"], proofreading: ["Punctuation and prepositions"], phrasal_verbs: ["Verbs for travel and work"], native_expressions: ["Common idioms"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'Have you ___ your homework yet?', options: ['do', 'did', 'done'], a: 'done' }) }
             },
             'B2': {
-                title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.',
-                topics: { grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], vocabulary: ["News", "Business", "Idioms"], proofreading: ["Complex sentence structure"], phrasal_verbs: ["Verbs for formal contexts"], native_expressions: ["Nuanced expressions"] },
+                title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.', xpToComplete: 2500,
+                topics: { grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], vocabulary: ["News", "Business", "Idioms"], writing_lab: ["Writing a for and against essay"], proofreading: ["Complex sentence structure"], phrasal_verbs: ["Verbs for formal contexts"], native_expressions: ["Nuanced expressions"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'If I had known, I ___ have come.', options: ['would', 'will', 'should'], a: 'would' }) }
             },
             'C1': {
-                title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.',
-                topics: { grammar: ["Inversions", "Participle Clauses", "Subjunctive"], vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], proofreading: ["Register and tone"], phrasal_verbs: ["Less common phrasal verbs"], native_expressions: ["Colloquialisms"] },
+                title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.', xpToComplete: 3000,
+                topics: { grammar: ["Inversions", "Participle Clauses", "Subjunctive"], vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], writing_lab: ["Writing a report"], proofreading: ["Register and tone"], phrasal_verbs: ["Less common phrasal verbs"], native_expressions: ["Colloquialisms"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'Not only ___ he tired, but he was also ill.', options: ['was', 'is', 'be'], a: 'was' }) }
             },
             'C2': {
-                title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.',
-                topics: { grammar: ["Advanced structures", "Stylistics"], vocabulary: ["Specialized vocabulary", "Wordplay"], proofreading: ["Stylistic choices"], phrasal_verbs: ["Obscure phrasal verbs"], native_expressions: ["Cultural references"] },
+                title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.', xpToComplete: 4000,
+                topics: { grammar: ["Advanced structures", "Stylistics"], vocabulary: ["Specialized vocabulary", "Wordplay"], writing_lab: ["Writing a proposal"], proofreading: ["Stylistic choices"], phrasal_verbs: ["Obscure phrasal verbs"], native_expressions: ["Cultural references"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'The book, ___ author is unknown, is a masterpiece.', options: ['which', 'whose', 'who'], a: 'whose' }) }
             }
         };
@@ -338,9 +369,11 @@
         const modalTitle = document.getElementById('level-title');
         const modalContentArea = document.getElementById('level-content-area');
         const closeModalBtn = document.getElementById('close-modal-btn');
+        const xpCounter = document.getElementById('xp-counter');
+        const streakCounter = document.getElementById('streak-counter');
+        const dailyChallengeContainer = document.getElementById('daily-challenge-content');
 
         // --- APP LOGIC ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let currentUserId = null;
 
         async function initializeAppAndAuth() {
@@ -350,6 +383,7 @@
                     await loadUserData();
                     if (userData && userData.name) {
                         if (userData.placementTestTaken) {
+                            checkDailyStreak();
                             showDashboard();
                         } else {
                             showPlacementChoice();
@@ -363,33 +397,39 @@
                 }
             });
 
-            try {
-                if (auth.currentUser) return;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
+            if (!auth.currentUser) {
+                try {
                     await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+                        const errorContainer = document.getElementById('login-error-container');
+                        errorContainer.innerHTML = `
+                            <div class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-left">
+                                <strong class="font-bold">Error de Configuración:</strong>
+                                <p class="text-sm">Para usar la app, por favor habilita el método de inicio de sesión "Anónimo" en tu consola de Firebase.</p>
+                                <p class="text-xs mt-2">Guía: Authentication -> Sign-in method -> Add new provider -> Anonymous.</p>
+                            </div>`;
+                    }
                 }
-            } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                if (!auth.currentUser) await signInAnonymously(auth);
             }
         }
 
         async function loadUserData() {
             if (!currentUserId) return;
-            const docRef = doc(db, "artifacts", appId, "users", currentUserId, "english4u_data", "progress");
+            const docRef = doc(db, "english4u_users", currentUserId);
             try {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    userData = { ...userData, ...docSnap.data() };
+                    const loadedData = docSnap.data();
+                    userData = { ...userData, ...loadedData };
                 }
             } catch (error) { console.error("Error loading user data:", error); }
         }
 
         async function saveUserData() {
             if (!currentUserId) return;
-            const docRef = doc(db, "artifacts", appId, "users", currentUserId, "english4u_data", "progress");
+            const docRef = doc(db, "english4u_users", currentUserId);
             try {
                 await setDoc(docRef, userData, { merge: true });
             } catch (error) { console.error("Error saving user data:", error); }
@@ -406,13 +446,16 @@
             placementChoiceScreen.classList.remove('hidden');
         }
         
-        function showDashboard() {
+        async function showDashboard() {
             loginScreen.classList.add('hidden');
             placementChoiceScreen.classList.add('hidden');
             placementTestScreen.classList.add('hidden');
             mainDashboard.classList.remove('hidden');
             welcomeName.textContent = `¡Hola, ${userData.name}!`;
+            xpCounter.textContent = userData.xp;
+            streakCounter.textContent = userData.streak;
             renderDashboard();
+            await generateDailyChallenge();
         }
 
         function renderDashboard() {
@@ -421,9 +464,28 @@
                 const levelData = contentDB[levelId];
                 const isUnlocked = userData.unlockedLevels.includes(levelId);
                 const isCompleted = userData.unlockedLevels.indexOf(levelId) < userData.unlockedLevels.indexOf(userData.currentLevel);
-                let cardColor = isUnlocked ? (isCompleted ? 'bg-green-500' : levelData.color) : 'bg-gray-400';
+                let cardColor = isUnlocked ? (isCompleted ? 'from-green-500 to-green-600' : `from-${levelData.color.split('-')[1]}-500 to-${levelData.color.split('-')[1]}-600`) : 'from-gray-500 to-gray-600';
                 
-                const card = `<div id="level-${levelId}" class="level-card p-6 rounded-xl text-white shadow-lg ${cardColor} ${!isUnlocked ? 'locked' : 'cursor-pointer'}"><div class="flex justify-between items-start"><h3 class="text-2xl font-bold">${levelData.title}</h3><span class="text-sm font-semibold bg-white/30 px-2 py-1 rounded-full">${isUnlocked ? (isCompleted ? 'Completed' : 'Unlocked') : 'Locked'}</span></div><p class="mt-2">${levelData.description}</p></div>`;
+                const currentLevelXP = userData.levelProgress[levelId]?.xp || 0;
+                const xpToComplete = levelData.xpToComplete;
+                const progressPercentage = Math.min((currentLevelXP / xpToComplete) * 100, 100);
+
+                const card = `
+                    <div id="level-${levelId}" class="level-card p-6 rounded-2xl text-white shadow-lg bg-gradient-to-br ${cardColor} ${!isUnlocked ? 'locked' : 'cursor-pointer'} flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-2xl font-bold">${levelData.title}</h3>
+                                <span class="text-sm font-semibold bg-white/20 px-2 py-1 rounded-full">${isUnlocked ? (isCompleted ? 'Completed' : 'Unlocked') : 'Locked'}</span>
+                            </div>
+                            <p class="mt-2 opacity-80">${levelData.description}</p>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-xs font-medium opacity-90">${currentLevelXP} / ${xpToComplete} XP</p>
+                            <div class="progress-bar-xp mt-1">
+                                <div class="progress-bar-xp-fill h-2 rounded-full" style="width: ${progressPercentage}%;"></div>
+                            </div>
+                        </div>
+                    </div>`;
                 levelsContainer.innerHTML += card;
             });
             updateTotalProgress();
@@ -437,6 +499,41 @@
             totalProgressBar.style.width = `${progress}%`;
             totalProgressBar.textContent = `${progress}%`;
         }
+
+        function checkDailyStreak() {
+            const today = new Date().setHours(0,0,0,0);
+            const lastLogin = userData.lastLogin ? new Date(userData.lastLogin).setHours(0,0,0,0) : null;
+            
+            if (lastLogin === today) {
+                // already logged in today
+                return;
+            }
+            
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (lastLogin === yesterday.getTime()) {
+                userData.streak++;
+            } else {
+                userData.streak = 1; // Reset if not yesterday
+            }
+            userData.lastLogin = today;
+            saveUserData();
+        }
+
+        function addXP(amount, levelId) {
+            userData.xp += amount;
+            if (levelId) {
+                if (!userData.levelProgress[levelId]) {
+                    userData.levelProgress[levelId] = { xp: 0 };
+                }
+                userData.levelProgress[levelId].xp += amount;
+            }
+            xpCounter.textContent = userData.xp;
+            renderDashboard(); // Re-render to update XP bars
+            saveUserData();
+        }
+
         
         // --- PLACEMENT TEST ---
         function startPlacementTest() {
@@ -501,16 +598,19 @@
             modalTitle.textContent = levelData.title;
             
             const categories = Object.keys(levelData.topics);
+            const currentLevelXP = userData.levelProgress[levelId]?.xp || 0;
+            const xpToComplete = levelData.xpToComplete;
+            const examUnlocked = currentLevelXP >= xpToComplete;
             const hasExam = levelId === userData.currentLevel && levelData.exam && levelData.exam.questions.length > 0;
 
             const t = {
-                es: { finalExam: 'Examen Final', testKnowledge: 'Prueba tus Conocimientos', testInstructions: 'Este es el examen final del nivel. ¡Demuestra lo que has aprendido!', startExam: 'Comenzar Examen de Nivel' },
-                en: { finalExam: 'Final Exam', testKnowledge: 'Test Your Knowledge', testInstructions: 'This is the final exam for the level. Show what you\'ve learned!', startExam: 'Start Level Exam' }
+                es: { finalExam: 'Examen Final', testKnowledge: 'Prueba tus Conocimientos', testInstructions: '¡Has ganado suficientes XP para desbloquear el examen final!', startExam: 'Comenzar Examen de Nivel', examLocked: `Necesitas ${xpToComplete - currentLevelXP} XP más para desbloquear.` },
+                en: { finalExam: 'Final Exam', testKnowledge: 'Test Your Knowledge', testInstructions: 'You have earned enough XP to unlock the final exam!', startExam: 'Start Level Exam', examLocked: `You need ${xpToComplete - currentLevelXP} more XP to unlock.` }
             };
 
             let tabsHtml = `<div class="px-4 md:px-6 border-b border-gray-200 mb-4 flex flex-wrap bg-white">`;
             categories.forEach((category, index) => {
-                let categoryName = category.replace('_', ' ');
+                let categoryName = category.replace(/_/g, ' ');
                 tabsHtml += `<button class="tab-btn capitalize py-3 px-2 md:px-4 text-sm md:text-base ${index === 0 ? 'active' : ''}" data-target="tab-${category}">${categoryName}</button>`;
             });
             if (hasExam) {
@@ -522,28 +622,49 @@
             categories.forEach((category, index) => {
                 const topics = levelData.topics[category];
                 contentHtml += `<div id="tab-${category}" class="tab-content ${index > 0 ? 'hidden' : ''}"><div class="space-y-3">`;
-                topics.forEach((topic) => {
+                
+                if (category === 'writing_lab') {
                     contentHtml += `
-                        <details class="bg-white p-0 rounded-lg group shadow-sm">
-                            <summary class="font-semibold cursor-pointer list-none">${topic}</summary>
-                            <div class="p-4 border-t pt-3 space-y-4">
-                                <div class="ai-explanation-container p-4 ai-container" style="display: none;"></div>
-                                <div class="ai-exercise-container p-4 ai-container" style="display: none;"></div>
-                                <div class="flex flex-wrap gap-2">
-                                     <button class="generate-ai-explanation-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Explicación' : 'Explanation'}</button>
-                                     <button class="generate-ai-exercise-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Práctica' : 'Practice'}</button>
-                                </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2">${topics[0]}</h4>
+                            <div class="ai-writing-container p-4 ai-container">
+                                <textarea id="writing-input" class="w-full p-2 border border-gray-300 rounded-md h-40" placeholder="${lang === 'es' ? 'Escribe tu texto aquí...' : 'Write your text here...'}"></textarea>
+                                <button id="submit-writing-btn" class="mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md" data-level="${levelId}" data-topic="${topics[0]}" data-lang="${lang}">Revisar mi Texto</button>
+                                <div id="writing-feedback" class="mt-4"></div>
                             </div>
-                        </details>`;
-                });
+                        </div>`;
+                } else {
+                    topics.forEach((topic) => {
+                        contentHtml += `
+                            <details class="bg-white p-0 rounded-lg group shadow-sm">
+                                <summary class="font-semibold cursor-pointer list-none flex justify-between items-center">
+                                    <span>${topic}</span>
+                                    <span class="listen-btn" data-text="${topic}">🔊</span>
+                                </summary>
+                                <div class="p-4 border-t pt-3 space-y-4">
+                                    <div class="ai-explanation-container p-4 ai-container" style="display: none;"></div>
+                                    <div class="ai-exercise-container p-4 ai-container" style="display: none;"></div>
+                                    <div class="flex flex-wrap gap-2">
+                                         <button class="generate-ai-explanation-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Explicación (+10 XP)' : 'Explanation (+10 XP)'}</button>
+                                         <button class="generate-ai-exercise-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Práctica (+50 XP)' : 'Practice (+50 XP)'}</button>
+                                    </div>
+                                </div>
+                            </details>`;
+                    });
+                }
                 contentHtml += '</div></div>';
             });
              if (hasExam) {
                 contentHtml += `<div id="tab-examen" class="tab-content hidden text-center p-4 md:p-8 bg-white rounded-lg shadow-inner">
-                    <h3 class="text-2xl font-bold mb-4">${t[lang].testKnowledge}</h3>
-                    <p class="text-gray-600 mb-6">${t[lang].testInstructions}</p>
-                    <button id="start-exam-btn" data-level="${levelId}" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-lg">${t[lang].startExam}</button>
-                </div>`;
+                    <h3 class="text-2xl font-bold mb-4">${t[lang].testKnowledge}</h3>`;
+                if(examUnlocked) {
+                    contentHtml += `<p class="text-green-600 font-semibold mb-6">${t[lang].testInstructions}</p>
+                    <button id="start-exam-btn" data-level="${levelId}" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-lg">${t[lang].startExam}</button>`;
+                } else {
+                    contentHtml += `<p class="text-red-600 font-semibold mb-6">${t[lang].examLocked}</p>
+                    <button disabled class="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed">${t[lang].startExam}</button>`;
+                }
+                contentHtml += `</div>`;
             }
 
             modalContentArea.innerHTML = tabsHtml + contentHtml;
@@ -595,6 +716,7 @@
 
             let resultHtml;
             if (score >= examData.passScore) {
+                addXP(500, levelId); // Big XP boost for passing exam
                 const allLevels = Object.keys(contentDB);
                 const currentIndex = allLevels.indexOf(levelId);
                 const nextLevelId = allLevels[currentIndex + 1];
@@ -605,12 +727,12 @@
                         userData.unlockedLevels.push(nextLevelId);
                     }
                     resultHtml = `<div class="text-center p-6"><h3 class="text-2xl font-bold text-green-500 mb-4">${t[lang].pass}</h3><p class="text-lg mb-4">${t[lang].score}</p><p class="text-lg font-semibold">${t[lang].passNext} ${nextLevelId}!</p>
-                    <div class="my-6"><canvas id="performanceChart"></canvas></div>
+                    <div class="my-6 max-w-md mx-auto"><canvas id="performanceChart"></canvas></div>
                     <button id="download-cert-btn" data-level="${levelId}" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].downloadCert}</button>
                     <button id="continue-btn" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].continue}</button></div>`;
                 } else {
                      resultHtml = `<div class="text-center p-6"><h3 class="text-2xl font-bold text-green-500 mb-4">${t[lang].mastery}</h3><p class="text-lg mb-4">${t[lang].masteryDesc}</p>
-                     <div class="my-6"><canvas id="performanceChart"></canvas></div>
+                     <div class="my-6 max-w-md mx-auto"><canvas id="performanceChart"></canvas></div>
                      <button id="download-cert-btn" data-level="${levelId}" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].downloadCert}</button>
                      <button id="continue-btn" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].toDashboard}</button></div>`;
                 }
@@ -637,10 +759,10 @@
             const ctx = document.getElementById('performanceChart').getContext('2d');
             const overallPercentage = (userScore / totalQuestions) * 100;
             
-            // Dummy data for breakdown - in a real app this would be calculated
-            const grammarScore = Math.random() * 90 + 10;
-            const vocabScore = Math.random() * 90 + 10;
-            const skillsScore = Math.random() * 90 + 10;
+            // Dummy data for breakdown - in a real app this would be calculated from question categories
+            const grammarScore = Math.random() * 40 + 55;
+            const vocabScore = Math.random() * 40 + 58;
+            const skillsScore = Math.random() * 40 + 50;
 
             new Chart(ctx, {
                 type: 'radar',
@@ -740,7 +862,7 @@
                     };
                 }
 
-                const apiKey = ""; // Provided by environment
+                const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
@@ -756,9 +878,10 @@
                     const contentPart = result.candidates[0].content.parts[0];
                     if (isInteractive) {
                         const exerciseData = JSON.parse(contentPart.text);
-                        renderInteractiveExercise(container, exerciseData.exercises, button.dataset.lang, button.dataset.category);
+                        renderInteractiveExercise(container, exerciseData.exercises, button.dataset.lang, button.dataset.category, button.dataset.level);
                     } else {
                         container.innerHTML = contentPart.text;
+                        addXP(10, button.dataset.level);
                     }
                 } else {
                     throw new Error("No content received from API.");
@@ -773,12 +896,12 @@
             }
         }
 
-        function renderInteractiveExercise(container, exercises, lang, category) {
+        function renderInteractiveExercise(container, exercises, lang, category, levelId) {
             const t = {
                 es: { title: "Misión de Práctica", check: "Revisar Respuestas" },
                 en: { title: "Practice Mission", check: "Check Answers" }
             };
-            let exerciseHtml = `<h3><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> ${t[lang].title}</h3><form class="interactive-exercise-form space-y-4 mt-2">`;
+            let exerciseHtml = `<h3><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> ${t[lang].title}</h3><form class="interactive-exercise-form space-y-4 mt-2" data-level-id="${levelId}">`;
             
             if (category === 'proofreading') {
                 const text = exercises[0].question;
@@ -790,10 +913,13 @@
                 exerciseHtml += `</p><input type="hidden" id="proofreading-answers" value="${exercises[0].answer}">`;
             } else {
                 exercises.forEach((ex, index) => {
-                    exerciseHtml += `<div class="exercise-question p-3 rounded-lg border border-slate-200 bg-slate-50" data-answer="${ex.answer}" data-type="${ex.type}">
-                        <p class="font-semibold mb-2 text-slate-800">${index + 1}. ${ex.question.replace('___', '<span class="font-bold text-blue-600">[BLANK]</span>')}</p>`;
+                    exerciseHtml += `<div class="exercise-question p-3 rounded-lg border border-slate-200 bg-slate-50" data-answer="${ex.answer}" data-type="${ex.type}">`;
                     
-                    if (ex.type === 'multiple-choice') {
+                    if (ex.type === 'fill-in-the-blank') {
+                        const questionHtml = ex.question.replace('___', `<input type="text" name="ex-q${index}" class="inline-block w-40 p-1 mx-1 border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent text-center font-semibold">`);
+                        exerciseHtml += `<p class="font-semibold mb-2 text-slate-800">${index + 1}. ${questionHtml}</p>`;
+                    } else { // multiple-choice
+                        exerciseHtml += `<p class="font-semibold mb-2 text-slate-800">${index + 1}. ${ex.question}</p>`;
                         exerciseHtml += `<div class="space-y-1">`;
                         ex.options.forEach(opt => {
                             exerciseHtml += `
@@ -803,8 +929,6 @@
                                 </label>`;
                         });
                         exerciseHtml += `</div>`;
-                    } else if (ex.type === 'fill-in-the-blank') {
-                        exerciseHtml += `<input type="text" name="ex-q${index}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" placeholder="${lang === 'es' ? 'Escribe tu respuesta...' : 'Type your answer...'}">`;
                     }
                     exerciseHtml += `</div>`;
                 });
@@ -814,7 +938,8 @@
 
             container.querySelector('.interactive-exercise-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                checkInteractiveExercise(e.target);
+                const correctCount = checkInteractiveExercise(e.target);
+                addXP(correctCount * 5, e.target.dataset.levelId); // 5 XP per correct answer
             });
             
             if (category === 'proofreading') {
@@ -825,6 +950,7 @@
         }
 
         function checkInteractiveExercise(form) {
+            let correctAnswers = 0;
             const questions = form.querySelectorAll('.exercise-question');
             if (questions.length > 0) { // Standard exercises
                 questions.forEach(qDiv => {
@@ -841,7 +967,9 @@
                                 label.classList.add('correct-answer');
                             }
                         });
-                        if (selectedRadio && selectedRadio.value.toLowerCase() !== correctAnswer) {
+                        if (selectedRadio && selectedRadio.value.toLowerCase() === correctAnswer) {
+                            correctAnswers++;
+                        } else if (selectedRadio) {
                             selectedRadio.parentElement.classList.add('incorrect-answer');
                         }
                     } else if (type === 'fill-in-the-blank') {
@@ -849,6 +977,7 @@
                         input.classList.remove('fill-in-correct', 'fill-in-incorrect');
                         if (input.value.trim().toLowerCase() === correctAnswer) {
                             input.classList.add('fill-in-correct');
+                            correctAnswers++;
                         } else {
                             input.classList.add('fill-in-incorrect');
                         }
@@ -858,6 +987,8 @@
                 const answerInput = form.querySelector('#proofreading-answers');
                 const correctIndices = answerInput.value.split(',').map(Number);
                 const words = form.querySelectorAll('.proofreading-word');
+                let foundCorrect = 0;
+                let foundIncorrect = 0;
                 words.forEach((wordEl, index) => {
                     wordEl.classList.remove('correct-answer', 'incorrect-answer');
                     const isCorrectError = correctIndices.includes(index);
@@ -865,18 +996,48 @@
 
                     if (isCorrectError && isSelected) {
                         wordEl.classList.add('correct-answer');
+                        foundCorrect++;
                     } else if (!isCorrectError && isSelected) {
                         wordEl.classList.add('incorrect-answer');
+                        foundIncorrect++;
                     } else if (isCorrectError && !isSelected) {
                         wordEl.classList.add('incorrect-answer'); // Highlight missed errors
                     }
                 });
+                correctAnswers = Math.max(0, foundCorrect - foundIncorrect);
             }
+            return correctAnswers;
         }
 
 
         function closeModal() {
             modal.classList.add('hidden');
+        }
+        
+        function textToSpeech(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Lo sentimos, tu navegador no soporta la función de voz.');
+            }
+        }
+
+        async function generateDailyChallenge() {
+            const lang = ['A1', 'A2'].includes(userData.currentLevel) ? 'es' : 'en';
+            const prompt = `Create a short and fun daily challenge of 5 questions for an English learner at level ${userData.currentLevel}. Include a mix of topics like grammar, vocabulary, and phrasal verbs. The entire response must be in ${lang}.`;
+            // Create a mock button object to pass the necessary data
+            const mockButton = {
+                dataset: {
+                    lang: lang,
+                    category: 'daily_challenge',
+                    level: userData.currentLevel
+                },
+                disabled: false,
+                classList: { add: () => {}, remove: () => {} }
+            };
+            await generateAiContent(mockButton, prompt, dailyChallengeContainer, true);
         }
 
         // --- EVENT LISTENERS ---
@@ -911,6 +1072,27 @@
                     generateAiContent(e.target, prompt, container, true);
                 });
             });
+            
+            document.querySelectorAll('.listen-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent details from closing
+                    textToSpeech(e.currentTarget.dataset.text);
+                });
+            });
+            
+            const submitWritingBtn = document.getElementById('submit-writing-btn');
+            if (submitWritingBtn) {
+                submitWritingBtn.addEventListener('click', async (e) => {
+                    const { level, topic, lang } = e.target.dataset;
+                    const userInput = document.getElementById('writing-input').value;
+                    const feedbackContainer = document.getElementById('writing-feedback');
+                    if (!userInput.trim()) return;
+
+                    const prompt = `As an expert English writing tutor, analyze the following text written by a level ${level} student on the topic "${topic}". The text is: "${userInput}". Provide constructive feedback. Identify errors (grammar, vocabulary, style), explain why they are errors, and provide a corrected version of the text. The entire response must be in ${lang}. Format the feedback in clear, easy-to-read HTML.`;
+                    await generateAiContent(e.target, prompt, feedbackContainer, false);
+                    addXP(100, level);
+                });
+            }
 
             const startExamBtn = document.getElementById('start-exam-btn');
             if(startExamBtn) {
