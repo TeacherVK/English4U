@@ -292,34 +292,34 @@
         // --- EXPANDED CONTENT DATABASE ---
         const contentDB = {
             'A1': {
-                title: 'A1: Principiante', color: 'bg-teal-500', description: 'Aprende lo básico para comunicarte.', xpToComplete: 1000,
-                topics: { gramática: ["Verbo to be", "Presente Simple", "Artículos"], vocabulario: ["Saludos", "Números", "Familia"], proofreading: ["Errores comunes en A1"], phrasal_verbs: ["Phrasal Verbs básicos"], native_expressions: ["Expresiones cotidianas"] },
+                title: 'A1: Beginner', color: 'bg-teal-500', description: 'Learn the basics to communicate.', xpToComplete: 1000,
+                topics: { grammar: ["Verb to be", "Simple Present", "Articles"], vocabulary: ["Greetings", "Numbers", "Family"], proofreading: ["Common A1 Errors"], phrasal_verbs: ["Basic Phrasal Verbs"], native_expressions: ["Everyday Expressions"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options: ['am', 'is', 'are'], a: 'is' }) }
             },
             'A2': {
-                title: 'A2: Elemental', color: 'bg-blue-500', description: 'Describe tu entorno y experiencias.', xpToComplete: 1500,
-                topics: { gramática: ["Pasado Simple", "Presente Continuo", "Futuro 'going to'"], vocabulario: ["Rutinas", "Hobbies", "Viajes"], proofreading: ["Identificar tiempo verbal incorrecto"], phrasal_verbs: ["Verbos con 'get' y 'go'"], native_expressions: ["Frases para socializar"] },
+                title: 'A2: Elementary', color: 'bg-blue-500', description: 'Describe your environment and experiences.', xpToComplete: 1500,
+                topics: { grammar: ["Simple Past", "Present Continuous", "Future with 'going to'"], vocabulary: ["Daily Routines", "Hobbies", "Travel"], proofreading: ["Identifying wrong tenses"], phrasal_verbs: ["Verbs with 'get' & 'go'"], native_expressions: ["Phrases for socializing"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
             },
             'B1': {
                 title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.', xpToComplete: 2000,
                 topics: { grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], vocabulary: ["Work", "Education", "Health"], writing_lab: ["Writing an informal email"], proofreading: ["Punctuation and prepositions"], phrasal_verbs: ["Verbs for travel and work"], native_expressions: ["Common idioms"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'Have you ___ your homework yet?', options: ['do', 'did', 'done'], a: 'done' }) }
+                exam: { passScore: 28, questions: [] }
             },
             'B2': {
                 title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.', xpToComplete: 2500,
                 topics: { grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], vocabulary: ["News", "Business", "Idioms"], writing_lab: ["Writing a for and against essay"], proofreading: ["Complex sentence structure"], phrasal_verbs: ["Verbs for formal contexts"], native_expressions: ["Nuanced expressions"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'If I had known, I ___ have come.', options: ['would', 'will', 'should'], a: 'would' }) }
+                exam: { passScore: 28, questions: [] }
             },
             'C1': {
                 title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.', xpToComplete: 3000,
                 topics: { grammar: ["Inversions", "Participle Clauses", "Subjunctive"], vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], writing_lab: ["Writing a report"], proofreading: ["Register and tone"], phrasal_verbs: ["Less common phrasal verbs"], native_expressions: ["Colloquialisms"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'Not only ___ he tired, but he was also ill.', options: ['was', 'is', 'be'], a: 'was' }) }
+                exam: { passScore: 28, questions: [] }
             },
             'C2': {
                 title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.', xpToComplete: 4000,
                 topics: { grammar: ["Advanced structures", "Stylistics"], vocabulary: ["Specialized vocabulary", "Wordplay"], writing_lab: ["Writing a proposal"], proofreading: ["Stylistic choices"], phrasal_verbs: ["Obscure phrasal verbs"], native_expressions: ["Cultural references"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'The book, ___ author is unknown, is a masterpiece.', options: ['which', 'whose', 'who'], a: 'whose' }) }
+                exam: { passScore: 28, questions: [] }
             }
         };
         
@@ -672,18 +672,36 @@
             modal.classList.remove('hidden');
         }
         
-        function startExam(levelId) {
-            const examData = contentDB[levelId].exam;
+        async function startExam(levelId) {
+            const examData = contentDB[levelId];
             const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
             const title = lang === 'es' ? `Examen Nivel ${levelId}` : `Level ${levelId} Exam`;
             
-            let examHtml = `<div class="text-left bg-white p-6 rounded-lg shadow-lg"><h3 class="text-2xl font-bold mb-6 text-center">${examData.title || title}</h3><div id="exam-form" class="space-y-6">`;
-            examData.questions.forEach((q, index) => {
+            let questions = examData.questions;
+            if (!questions || questions.length < 35) {
+                const container = modalContentArea;
+                container.innerHTML = `<div class="flex items-center justify-center p-4"><div class="spinner w-8 h-8 rounded-full border-4 border-gray-200"></div><p class="ml-3 text-lg text-gray-500">Generating Exam...</p></div>`;
+                const prompt = `Create a comprehensive final exam of 35 multiple-choice questions for an English learner at CEFR level ${levelId}. Cover a wide range of topics appropriate for this level, including grammar, vocabulary, and common expressions. The entire response must be in ${lang}.`;
+                
+                const mockButton = { dataset: { level: levelId, lang: lang, category: 'exam' }, disabled: false, classList: { add: () => {}, remove: () => {} } };
+                
+                await generateAiContent(mockButton, prompt, container, true, (generatedExercises) => {
+                    examData.questions = generatedExercises; // Cache the generated questions
+                    renderExamForm(levelId, title, generatedExercises);
+                });
+            } else {
+                renderExamForm(levelId, title, questions);
+            }
+        }
+
+        function renderExamForm(levelId, title, questions) {
+            let examHtml = `<div class="text-left bg-white p-6 rounded-lg shadow-lg"><h3 class="text-2xl font-bold mb-6 text-center">${title}</h3><div id="exam-form" class="space-y-6">`;
+            questions.forEach((q, index) => {
                 examHtml += `
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                        <p class="font-semibold mb-3 text-slate-800">${index + 1}. ${q.q}</p>
+                        <p class="font-semibold mb-3 text-slate-800">${index + 1}. ${q.question || q.q}</p>
                         <div class="space-y-2">`;
-                q.options.forEach(opt => {
+                (q.options || []).forEach(opt => {
                     examHtml += `
                         <div><label class="flex items-center cursor-pointer p-2 rounded-md hover:bg-slate-100 transition">
                             <input type="radio" name="q${index}" value="${opt}" class="mr-3"><span class="text-slate-700">${opt}</span>
@@ -691,27 +709,29 @@
                 });
                 examHtml += `</div></div>`;
             });
+            const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
             examHtml += `<button id="submit-exam-btn" data-level="${levelId}" class="w-full mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg text-lg">${lang === 'es' ? 'Entregar Examen' : 'Submit Exam'}</button>`;
             examHtml += `</div></div>`;
             
             modalContentArea.innerHTML = examHtml;
-            document.getElementById('submit-exam-btn').addEventListener('click', (e) => submitExam(e.target.dataset.level));
+            document.getElementById('submit-exam-btn').addEventListener('click', (e) => submitExam(e.target.dataset.level, questions));
         }
 
-        function submitExam(levelId) {
-            const examData = contentDB[levelId].exam;
+
+        function submitExam(levelId, questions) {
+            const examData = contentDB[levelId];
             let score = 0;
-            examData.questions.forEach((q, index) => {
+            questions.forEach((q, index) => {
                 const selected = document.querySelector(`input[name="q${index}"]:checked`);
-                if (selected && selected.value === q.a) {
+                if (selected && selected.value === (q.answer || q.a)) {
                     score++;
                 }
             });
 
             const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
             const t = {
-                es: { pass: "¡Felicidades! ¡Nivel Superado!", fail: "Necesitas practicar más", score: `Has obtenido ${score} de ${examData.questions.length} respuestas correctas.`, passNext: `¡Has desbloqueado el nivel`, failReq: `Necesitas al menos ${examData.passScore} para pasar.`, failAdvice: "¡No te rindas! Repasa el material y vuelve a intentarlo.", continue: "Continuar", retry: "Volver a Estudiar", mastery: "¡MAESTRÍA COMPLETA!", masteryDesc: "¡Has completado todos los niveles! Eres un maestro del inglés.", toDashboard: "Volver al Panel", report: "Ver Reporte de Desempeño", downloadCert: "Descargar Certificado" },
-                en: { pass: "Congratulations! Level Cleared!", fail: "You need more practice", score: `You got ${score} out of ${examData.questions.length} correct.`, passNext: `You have unlocked level`, failReq: `You need at least ${examData.passScore} to pass.`, failAdvice: "Don't give up! Review the material and try again.", continue: "Continue", retry: "Study Again", mastery: "MASTERY COMPLETE!", masteryDesc: "You have completed all levels! You are an English master.", toDashboard: "Back to Dashboard", report: "View Performance Report", downloadCert: "Download Certificate" }
+                es: { pass: "¡Felicidades! ¡Nivel Superado!", fail: "Necesitas practicar más", score: `Has obtenido ${score} de ${questions.length} respuestas correctas.`, passNext: `¡Has desbloqueado el nivel`, failReq: `Necesitas al menos ${examData.passScore} para pasar.`, failAdvice: "¡No te rindas! Repasa el material y vuelve a intentarlo.", continue: "Continuar", retry: "Volver a Estudiar", mastery: "¡MAESTRÍA COMPLETA!", masteryDesc: "¡Has completado todos los niveles! Eres un maestro del inglés.", toDashboard: "Volver al Panel", report: "Ver Reporte de Desempeño", downloadCert: "Descargar Certificado" },
+                en: { pass: "Congratulations! Level Cleared!", fail: "You need more practice", score: `You got ${score} out of ${questions.length} correct.`, passNext: `You have unlocked level`, failReq: `You need at least ${examData.passScore} to pass.`, failAdvice: "Don't give up! Review the material and try again.", continue: "Continue", retry: "Study Again", mastery: "MASTERY COMPLETE!", masteryDesc: "You have completed all levels! You are an English master.", toDashboard: "Back to Dashboard", report: "View Performance Report", downloadCert: "Download Certificate" }
             };
 
             let resultHtml;
@@ -743,7 +763,7 @@
             modalContentArea.innerHTML = resultHtml;
             
             if (score >= examData.passScore) {
-                renderPerformanceChart(levelId, score, examData.questions.length);
+                renderPerformanceChart(levelId, score, questions.length);
                 document.getElementById('download-cert-btn').addEventListener('click', (e) => downloadCertificate(e.target.dataset.level));
             }
 
@@ -828,7 +848,7 @@
         }
 
 
-        async function generateAiContent(button, prompt, container, isInteractive = false) {
+        async function generateAiContent(button, prompt, container, isInteractive = false, callback) {
              container.style.display = 'block';
              container.innerHTML = `<div class="flex items-center justify-center p-4"><div class="spinner w-6 h-6 rounded-full border-4 border-gray-200"></div><p class="ml-3 text-sm text-gray-500">Generating with AI...</p></div>`;
              button.disabled = true;
@@ -881,7 +901,11 @@
                     const contentPart = result.candidates[0].content.parts[0];
                     if (isInteractive) {
                         const exerciseData = JSON.parse(contentPart.text);
-                        renderInteractiveExercise(container, exerciseData.exercises, button.dataset.lang, button.dataset.category, button.dataset.level);
+                        if (callback) {
+                            callback(exerciseData.exercises);
+                        } else {
+                            renderInteractiveExercise(container, exerciseData.exercises, button.dataset.lang, button.dataset.category, button.dataset.level);
+                        }
                     } else {
                         container.innerHTML = contentPart.text;
                         addXP(10, button.dataset.level);
@@ -928,7 +952,7 @@
                             exerciseHtml += `
                                 <label class="block p-2 rounded-md border border-gray-200 cursor-pointer hover:bg-gray-100 bg-white">
                                     <input type="radio" name="ex-q${index}" value="${opt}" class="mr-2">
-                                    <span>${opt}</span>
+                                    <span class="text-slate-700">${opt}</span>
                                 </label>`;
                         });
                         exerciseHtml += `</div>`;
