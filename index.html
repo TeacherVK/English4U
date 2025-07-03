@@ -862,9 +862,9 @@
                     };
                 }
 
-                const apiKey = window.VITE_GEMINI_API_KEY; // Use the globally defined key
-                if (!apiKey) {
-                    throw new Error("Gemini API Key not found. Please configure it in your deployment environment.");
+                const apiKey = "AIzaSyBmF-CdWSAlo6m1m81_ExAfog6MzNKf90M";
+                if (!apiKey || apiKey === "REPLACE_THIS_WITH_YOUR_GEMINI_API_KEY") {
+                    throw new Error("Gemini API Key not found. Please paste your key into the code.");
                 }
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
