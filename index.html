@@ -99,6 +99,24 @@
         .draggable { cursor: grab; }
         .drop-target { border: 2px dashed #a7a7a7; }
         .drop-target.over { background-color: #e0e0e0; }
+
+        @keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-out { from { opacity: 1; } to { opacity: 0; height: 0; padding: 0; margin: 0; border: 0; } }
+        .fade-in { animation: fade-in 0.5s ease-out forwards; }
+        .fade-out { animation: fade-out 0.5s ease-in forwards; }
+
+        .xp-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: xp-float 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes xp-float {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, -50px); opacity: 0; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-gray-800">
@@ -293,32 +311,32 @@
         const contentDB = {
             'A1': {
                 title: 'A1: Beginner', color: 'bg-teal-500', description: 'Learn the basics to communicate.', xpToComplete: 1000,
-                topics: { grammar: ["Verb to be", "Simple Present", "Articles"], vocabulary: ["Greetings", "Numbers", "Family"], proofreading: ["Common A1 Errors"], phrasal_verbs: ["Basic Phrasal Verbs"], native_expressions: ["Everyday Expressions"] },
+                topics: { Grammar: ["Verb to be", "Simple Present", "Articles"], Vocabulary: ["Greetings", "Numbers", "Family"], Proofreading: ["Common A1 Errors"], Phrasal_Verbs: ["Basic Phrasal Verbs"], Native_Expressions: ["Everyday Expressions"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options: ['am', 'is', 'are'], a: 'is' }) }
             },
             'A2': {
                 title: 'A2: Elementary', color: 'bg-blue-500', description: 'Describe your environment and experiences.', xpToComplete: 1500,
-                topics: { grammar: ["Simple Past", "Present Continuous", "Future with 'going to'"], vocabulary: ["Daily Routines", "Hobbies", "Travel"], proofreading: ["Identifying wrong tenses"], phrasal_verbs: ["Verbs with 'get' & 'go'"], native_expressions: ["Phrases for socializing"] },
+                topics: { Grammar: ["Simple Past", "Present Continuous", "Future with 'going to'"], Vocabulary: ["Daily Routines", "Hobbies", "Travel"], Proofreading: ["Identifying wrong tenses"], Phrasal_Verbs: ["Verbs with 'get' & 'go'"], Native_Expressions: ["Phrases for socializing"] },
                 exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
             },
             'B1': {
                 title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.', xpToComplete: 2000,
-                topics: { grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], vocabulary: ["Work", "Education", "Health"], writing_lab: ["Writing an informal email"], proofreading: ["Punctuation and prepositions"], phrasal_verbs: ["Verbs for travel and work"], native_expressions: ["Common idioms"] },
+                topics: { Grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], Vocabulary: ["Work", "Education", "Health"], Writing_Lab: ["Writing an informal email"], Proofreading: ["Punctuation and prepositions"], Phrasal_Verbs: ["Verbs for travel and work"], Native_Expressions: ["Common idioms"] },
                 exam: { passScore: 28, questions: [] }
             },
             'B2': {
                 title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.', xpToComplete: 2500,
-                topics: { grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], vocabulary: ["News", "Business", "Idioms"], writing_lab: ["Writing a for and against essay"], proofreading: ["Complex sentence structure"], phrasal_verbs: ["Verbs for formal contexts"], native_expressions: ["Nuanced expressions"] },
+                topics: { Grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], Vocabulary: ["News", "Business", "Idioms"], Writing_Lab: ["Writing a for and against essay"], Proofreading: ["Complex sentence structure"], Phrasal_Verbs: ["Verbs for formal contexts"], Native_Expressions: ["Nuanced expressions"] },
                 exam: { passScore: 28, questions: [] }
             },
             'C1': {
                 title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.', xpToComplete: 3000,
-                topics: { grammar: ["Inversions", "Participle Clauses", "Subjunctive"], vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], writing_lab: ["Writing a report"], proofreading: ["Register and tone"], phrasal_verbs: ["Less common phrasal verbs"], native_expressions: ["Colloquialisms"] },
+                topics: { Grammar: ["Inversions", "Participle Clauses", "Subjunctive"], Vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], Writing_Lab: ["Writing a report"], Proofreading: ["Register and tone"], Phrasal_Verbs: ["Less common phrasal verbs"], Native_Expressions: ["Colloquialisms"] },
                 exam: { passScore: 28, questions: [] }
             },
             'C2': {
                 title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.', xpToComplete: 4000,
-                topics: { grammar: ["Advanced structures", "Stylistics"], vocabulary: ["Specialized vocabulary", "Wordplay"], writing_lab: ["Writing a proposal"], proofreading: ["Stylistic choices"], phrasal_verbs: ["Obscure phrasal verbs"], native_expressions: ["Cultural references"] },
+                topics: { Grammar: ["Advanced structures", "Stylistics"], Vocabulary: ["Specialized vocabulary", "Wordplay"], Writing_Lab: ["Writing a proposal"], Proofreading: ["Stylistic choices"], Phrasal_Verbs: ["Obscure phrasal verbs"], Native_Expressions: ["Cultural references"] },
                 exam: { passScore: 28, questions: [] }
             }
         };
@@ -645,8 +663,8 @@
                                     <div class="ai-explanation-container p-4 ai-container" style="display: none;"></div>
                                     <div class="ai-exercise-container p-4 ai-container" style="display: none;"></div>
                                     <div class="flex flex-wrap gap-2">
-                                         <button class="generate-ai-explanation-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Explicación (+10 XP)' : 'Explanation (+10 XP)'}</button>
-                                         <button class="generate-ai-exercise-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Práctica (+50 XP)' : 'Practice (+50 XP)'}</button>
+                                         <button class="generate-ai-explanation-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg> <span>${lang === 'es' ? 'Explicación (+10 XP)' : 'Explanation (+10 XP)'}</span></button>
+                                         <button class="generate-ai-exercise-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> <span>${lang === 'es' ? 'Práctica (+50 XP)' : 'Practice (+50 XP)'}</span></button>
                                     </div>
                                 </div>
                             </details>`;
@@ -1171,3 +1189,4 @@
     </script>
 </body>
 </html>
+
