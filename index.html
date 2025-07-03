@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English4U by Teacher V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for graphs and jsPDF for certificates -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .logo-text {
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .level-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .locked {
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.6);
+        }
+        .spinner {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* --- New Design & Gamification Styles --- */
+        .tab-btn {
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            border-bottom-color: #f59e0b;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        details summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        details summary:hover {
+            background-color: #f1f5f9;
+        }
+        details summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+        .ai-container {
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(145deg, #ffffff, #f9fafb);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .ai-container h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .correct-answer {
+            background-color: #dcfce7 !important;
+            border-left: 4px solid #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2 !important;
+            border-left: 4px solid #ef4444;
+        }
+        .fill-in-correct {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 2px #86efac;
+        }
+        .fill-in-incorrect {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px #fca5a5;
+        }
+        .proofreading-word {
+            cursor: pointer;
+            border-bottom: 2px dotted transparent;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .proofreading-word:hover {
+            background-color: #fef9c3;
+        }
+        .proofreading-word.selected {
+            background-color: #fde68a;
+            border-bottom-color: #f59e0b;
+        }
+
+
+        /* --- New Animated Logo --- */
+        .animated-logo .sun-glow {
+            animation: sun-pulse 2s infinite ease-in-out;
+        }
+        .animated-logo .energy-ray {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw-ray 2s infinite ease-in-out;
+        }
+        @keyframes sun-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        @keyframes draw-ray {
+            0% { stroke-dashoffset: 100; }
+            40% { stroke-dashoffset: 0; }
+            80% { stroke-dashoffset: -100; }
+            100% { stroke-dashoffset: -100; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800">
+
+    <!-- App Container -->
+    <div id="app" class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+                <div class="flex justify-center items-center mb-6">
+                    <div class="animated-logo w-24 h-24 mr-2">
+                        <svg viewBox="0 0 100 100">
+                            <defs><radialGradient id="sunGradient"><stop offset="0%" stop-color="#FFD700" /><stop offset="100%" stop-color="#FFA500" /></radialGradient></defs>
+                            <circle class="sun-glow" cx="50" cy="25" r="15" fill="url(#sunGradient)"/>
+                            <path class="energy-ray" d="M50 40 Q 50 60, 60 80" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <path d="M 35 95 L 40 70 L 60 70 L 65 95 L 55 95 L 55 85 L 45 85 L 45 95 Z" fill="#4A5568"/>
+                            <circle cx="50" cy="60" r="5" fill="#4A5568"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl logo-text">English4U</h1>
+                        <p class="text-gray-500">by Teacher V</p>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">¡Bienvenido/a a tu aventura!</h2>
+                <p class="text-gray-600 mb-6">Ingresa tu nombre para guardar tu progreso y empezar a aprender.</p>
+                <input type="text" id="name-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="Escribe tu nombre aquí...">
+                <button id="start-btn" class="w-full mt-4 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">Continuar</button>
+            </div>
+        </div>
+        
+        <!-- Placement Test Choice Screen -->
+        <div id="placement-choice-screen" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg">
+                <h2 class="text-3xl font-bold mb-4 text-gray-800">¿Por dónde empezamos?</h2>
+                <p class="text-gray-600 mb-8">Si ya tienes conocimientos de inglés, haz nuestro examen de colocación para encontrar tu nivel ideal.</p>
+                <div class="space-y-4">
+                    <button id="start-from-beginning-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg text-lg">Empezar desde el principio (A1)</button>
+                    <button id="take-placement-test-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg text-lg">Hacer examen de colocación</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placement Test Screen -->
+        <div id="placement-test-screen" class="hidden">
+            <!-- Content will be injected by JS -->
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="main-dashboard" class="hidden">
+            <header class="bg-white p-6 rounded-2xl shadow-md mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                     <div class="flex items-center mb-4 md:mb-0">
+                        <div class="animated-logo w-20 h-20 mr-2">
+                           <svg viewBox="0 0 100 100">
+                                <defs><radialGradient id="sunGradientH"><stop offset="0%" stop-color="#FFD700" /><stop offset="100%" stop-color="#FFA500" /></radialGradient></defs>
+                                <circle class="sun-glow" cx="50" cy="25" r="15" fill="url(#sunGradientH)"/>
+                                <path class="energy-ray" d="M50 40 Q 50 60, 60 80" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <path d="M 35 95 L 40 70 L 60 70 L 65 95 L 55 95 L 55 85 L 45 85 L 45 95 Z" fill="#4A5568"/>
+                                <circle cx="50" cy="60" r="5" fill="#4A5568"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl md:text-3xl logo-text">English4U</h1>
+                            <p class="text-gray-500">by Teacher V</p>
+                        </div>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <h2 class="text-xl font-semibold" id="welcome-name"></h2>
+                        <p class="text-gray-600">Tu viaje hacia la maestría del Inglés</p>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h3 class="font-semibold text-lg mb-2">Progreso Total (A1 a C2)</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-6">
+                        <div id="total-progress-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-6 rounded-full text-center text-white font-bold text-sm flex items-center justify-center" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+            </header>
+
+            <main id="levels-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Level cards will be injected here by JavaScript -->
+            </main>
+        </div>
+
+        <!-- Level View / Exercise Modal -->
+        <div id="level-view-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+            <div id="level-view-content" class="bg-slate-50 w-full max-w-5xl h-full max-h-[90vh] rounded-2xl shadow-2xl flex flex-col">
+                <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-white rounded-t-2xl">
+                    <h2 id="level-title" class="text-3xl font-bold"></h2>
+                    <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="level-content-area" class="p-4 md:p-6 overflow-y-auto flex-grow">
+                    <!-- Content for the level will be injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        const { jsPDF } = window.jspdf;
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userData = { name: '', currentLevel: 'A1', unlockedLevels: ['A1'], levelProgress: {}, placementTestTaken: false };
+        
+        // --- EXPANDED CONTENT DATABASE ---
+        const contentDB = {
+            'A1': {
+                title: 'A1: Principiante', color: 'bg-teal-500', description: 'Aprende lo básico para comunicarte.',
+                topics: { gramática: ["Verbo to be", "Presente Simple", "Artículos"], vocabulario: ["Saludos", "Números", "Familia"], proofreading: ["Errores comunes en A1"], phrasal_verbs: ["Phrasal Verbs básicos"], native_expressions: ["Expresiones cotidianas"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options: ['am', 'is', 'are'], a: 'is' }) }
+            },
+            'A2': {
+                title: 'A2: Elemental', color: 'bg-blue-500', description: 'Describe tu entorno y experiencias.',
+                topics: { gramática: ["Pasado Simple", "Presente Continuo", "Futuro 'going to'"], vocabulario: ["Rutinas", "Hobbies", "Viajes"], proofreading: ["Identificar tiempo verbal incorrecto"], phrasal_verbs: ["Verbos con 'get' y 'go'"], native_expressions: ["Frases para socializar"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
+            },
+            'B1': {
+                title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.',
+                topics: { grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], vocabulary: ["Work", "Education", "Health"], proofreading: ["Punctuation and prepositions"], phrasal_verbs: ["Verbs for travel and work"], native_expressions: ["Common idioms"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'Have you ___ your homework yet?', options: ['do', 'did', 'done'], a: 'done' }) }
+            },
+            'B2': {
+                title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.',
+                topics: { grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], vocabulary: ["News", "Business", "Idioms"], proofreading: ["Complex sentence structure"], phrasal_verbs: ["Verbs for formal contexts"], native_expressions: ["Nuanced expressions"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'If I had known, I ___ have come.', options: ['would', 'will', 'should'], a: 'would' }) }
+            },
+            'C1': {
+                title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.',
+                topics: { grammar: ["Inversions", "Participle Clauses", "Subjunctive"], vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], proofreading: ["Register and tone"], phrasal_verbs: ["Less common phrasal verbs"], native_expressions: ["Colloquialisms"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'Not only ___ he tired, but he was also ill.', options: ['was', 'is', 'be'], a: 'was' }) }
+            },
+            'C2': {
+                title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.',
+                topics: { grammar: ["Advanced structures", "Stylistics"], vocabulary: ["Specialized vocabulary", "Wordplay"], proofreading: ["Stylistic choices"], phrasal_verbs: ["Obscure phrasal verbs"], native_expressions: ["Cultural references"] },
+                exam: { passScore: 28, questions: Array(35).fill({ q: 'The book, ___ author is unknown, is a masterpiece.', options: ['which', 'whose', 'who'], a: 'whose' }) }
+            }
+        };
+        
+        const placementTestQuestions = [
+            // A2 Level
+            { q: 'He didn\'t ___ to the party last night.', options: ['go', 'went', 'gone'], a: 'go' },
+            { q: 'New York is ___ than my city.', options: ['bigger', 'big', 'the biggest'], a: 'bigger' },
+            // B1 Level
+            { q: 'I haven\'t seen that movie ___.', options: ['already', 'yet', 'still'], a: 'yet' },
+            { q: 'If I ___ you, I would study more.', options: ['am', 'was', 'were'], a: 'were' },
+            { q: 'This report was ___ by the marketing team.', options: ['write', 'wrote', 'written'], a: 'written' },
+             // B2 Level
+            { q: 'By the time we arrived, the film ___ started.', options: ['has', 'had', 'was'], a: 'had' },
+            { q: 'She has been working here ___ three years.', options: ['for', 'since', 'in'], a: 'for' },
+            { q: 'If I had studied harder, I ___ the exam.', options: ['would pass', 'will pass', 'would have passed'], a: 'would have passed' },
+            { q: 'He denied ___ the money.', options: ['to steal', 'stealing', 'stole'], a: 'stealing' },
+            { q: 'I\'m really looking forward ___ you again.', options: ['to see', 'to seeing', 'see'], a: 'to seeing' },
+            // C1 Level
+            { q: 'Never before ___ such a beautiful sunset.', options: ['I have seen', 'have I seen', 'I saw'], a: 'have I seen' },
+            { q: 'It\'s high time you ___ responsibility.', options: ['take', 'took', 'have taken'], a: 'took' },
+            { q: '___ being exhausted, he finished the race.', options: ['Although', 'Despite', 'However'], a: 'Despite' },
+            { q: 'The company is on the ___ of a major breakthrough.', options: ['edge', 'verge', 'side'], a: 'verge' },
+            { q: 'She is considered to be ___ authority on the subject.', options: ['an', 'the', 'a'], a: 'an' },
+            // C2 Level
+            { q: 'The politician\'s speech was tantamount ___ a declaration of war.', options: ['with', 'to', 'for'], a: 'to' },
+            { q: 'Had it not been for your help, I ___ in serious trouble.', options: ['would be', 'would have been', 'will be'], a: 'would have been' },
+            { q: 'The nuances of the language are often lost in ___.', options: ['translate', 'translation', 'translating'], a: 'translation' },
+            { q: 'He is, to all ___ and purposes, the leader of the group.', options: ['intents', 'extents', 'intensions'], a: 'intents' },
+            { q: 'The team\'s efforts culminated ___ a spectacular victory.', options: ['in', 'with', 'to'], a: 'in' },
+        ];
+
+
+        // --- DOM ELEMENTS ---
+        const loginScreen = document.getElementById('login-screen');
+        const placementChoiceScreen = document.getElementById('placement-choice-screen');
+        const placementTestScreen = document.getElementById('placement-test-screen');
+        const mainDashboard = document.getElementById('main-dashboard');
+        const nameInput = document.getElementById('name-input');
+        const startBtn = document.getElementById('start-btn');
+        const startFromBeginningBtn = document.getElementById('start-from-beginning-btn');
+        const takePlacementTestBtn = document.getElementById('take-placement-test-btn');
+        const welcomeName = document.getElementById('welcome-name');
+        const levelsContainer = document.getElementById('levels-container');
+        const totalProgressBar = document.getElementById('total-progress-bar');
+        const modal = document.getElementById('level-view-modal');
+        const modalContent = document.getElementById('level-view-content');
+        const modalTitle = document.getElementById('level-title');
+        const modalContentArea = document.getElementById('level-content-area');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        // --- APP LOGIC ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let currentUserId = null;
+
+        async function initializeAppAndAuth() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    await loadUserData();
+                    if (userData && userData.name) {
+                        if (userData.placementTestTaken) {
+                            showDashboard();
+                        } else {
+                            showPlacementChoice();
+                        }
+                    } else {
+                        showLogin();
+                    }
+                } else {
+                    currentUserId = null;
+                    showLogin();
+                }
+            });
+
+            try {
+                if (auth.currentUser) return;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                if (!auth.currentUser) await signInAnonymously(auth);
+            }
+        }
+
+        async function loadUserData() {
+            if (!currentUserId) return;
+            const docRef = doc(db, "artifacts", appId, "users", currentUserId, "english4u_data", "progress");
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    userData = { ...userData, ...docSnap.data() };
+                }
+            } catch (error) { console.error("Error loading user data:", error); }
+        }
+
+        async function saveUserData() {
+            if (!currentUserId) return;
+            const docRef = doc(db, "artifacts", appId, "users", currentUserId, "english4u_data", "progress");
+            try {
+                await setDoc(docRef, userData, { merge: true });
+            } catch (error) { console.error("Error saving user data:", error); }
+        }
+
+        function showLogin() {
+            loginScreen.classList.remove('hidden');
+            placementChoiceScreen.classList.add('hidden');
+            mainDashboard.classList.add('hidden');
+        }
+
+        function showPlacementChoice() {
+            loginScreen.classList.add('hidden');
+            placementChoiceScreen.classList.remove('hidden');
+        }
+        
+        function showDashboard() {
+            loginScreen.classList.add('hidden');
+            placementChoiceScreen.classList.add('hidden');
+            placementTestScreen.classList.add('hidden');
+            mainDashboard.classList.remove('hidden');
+            welcomeName.textContent = `¡Hola, ${userData.name}!`;
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            levelsContainer.innerHTML = '';
+            Object.keys(contentDB).forEach(levelId => {
+                const levelData = contentDB[levelId];
+                const isUnlocked = userData.unlockedLevels.includes(levelId);
+                const isCompleted = userData.unlockedLevels.indexOf(levelId) < userData.unlockedLevels.indexOf(userData.currentLevel);
+                let cardColor = isUnlocked ? (isCompleted ? 'bg-green-500' : levelData.color) : 'bg-gray-400';
+                
+                const card = `<div id="level-${levelId}" class="level-card p-6 rounded-xl text-white shadow-lg ${cardColor} ${!isUnlocked ? 'locked' : 'cursor-pointer'}"><div class="flex justify-between items-start"><h3 class="text-2xl font-bold">${levelData.title}</h3><span class="text-sm font-semibold bg-white/30 px-2 py-1 rounded-full">${isUnlocked ? (isCompleted ? 'Completed' : 'Unlocked') : 'Locked'}</span></div><p class="mt-2">${levelData.description}</p></div>`;
+                levelsContainer.innerHTML += card;
+            });
+            updateTotalProgress();
+            addLevelCardListeners();
+        }
+        
+        function updateTotalProgress() {
+            const totalLevels = Object.keys(contentDB).length;
+            const unlockedCount = userData.unlockedLevels.length - 1;
+            const progress = Math.round((unlockedCount / (totalLevels - 1)) * 100);
+            totalProgressBar.style.width = `${progress}%`;
+            totalProgressBar.textContent = `${progress}%`;
+        }
+        
+        // --- PLACEMENT TEST ---
+        function startPlacementTest() {
+            placementChoiceScreen.classList.add('hidden');
+            placementTestScreen.classList.remove('hidden');
+            
+            let testHtml = `<div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl mx-auto my-8"><h2 class="text-3xl font-bold mb-6 text-center">Examen de Colocación</h2><form id="placement-form" class="space-y-6">`;
+            placementTestQuestions.forEach((q, index) => {
+                testHtml += `<div class="bg-slate-50 p-4 rounded-lg border border-slate-200"><p class="font-semibold mb-3 text-slate-800">${index + 1}. ${q.q}</p><div class="space-y-2">`;
+                q.options.forEach(opt => {
+                    testHtml += `<div><label class="flex items-center cursor-pointer p-2 rounded-md hover:bg-slate-100 transition"><input type="radio" name="pt-q${index}" value="${opt}" class="mr-3"><span class="text-slate-700">${opt}</span></label></div>`;
+                });
+                testHtml += `</div></div>`;
+            });
+            testHtml += `<button type="submit" class="w-full mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg text-lg">Finalizar Examen</button></form></div>`;
+            placementTestScreen.innerHTML = testHtml;
+
+            document.getElementById('placement-form').addEventListener('submit', handlePlacementTestSubmit);
+        }
+
+        async function handlePlacementTestSubmit(e) {
+            e.preventDefault();
+            let score = 0;
+            placementTestQuestions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="pt-q${index}"]:checked`);
+                if (selected && selected.value === q.a) {
+                    score++;
+                }
+            });
+
+            let placedLevel = 'A1';
+            if (score >= 16) placedLevel = 'C2';
+            else if (score >= 12) placedLevel = 'C1';
+            else if (score >= 7) placedLevel = 'B2';
+            else if (score >= 3) placedLevel = 'B1';
+            else if (score >= 1) placedLevel = 'A2';
+
+            userData.currentLevel = placedLevel;
+            const allLevels = Object.keys(contentDB);
+            const placedIndex = allLevels.indexOf(placedLevel);
+            userData.unlockedLevels = allLevels.slice(0, placedIndex + 1);
+            userData.placementTestTaken = true;
+
+            await saveUserData();
+            
+            placementTestScreen.innerHTML = `
+                <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg mx-auto my-8 text-center">
+                    <h2 class="text-3xl font-bold mb-4 text-gray-800">¡Examen Completado!</h2>
+                    <p class="text-gray-600 mb-2">Tu puntaje fue de ${score} de ${placementTestQuestions.length}.</p>
+                    <p class="text-gray-800 text-xl mb-8">Te recomendamos empezar en el nivel: <strong class="text-blue-600">${placedLevel}</strong></p>
+                    <button id="go-to-dashboard-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg text-lg">Ir a mi Panel de Control</button>
+                </div>
+            `;
+            document.getElementById('go-to-dashboard-btn').addEventListener('click', showDashboard);
+        }
+
+        // --- MODAL & CONTENT LOGIC ---
+        function openLevelModal(levelId) {
+            const levelData = contentDB[levelId];
+            const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
+            
+            modalTitle.textContent = levelData.title;
+            
+            const categories = Object.keys(levelData.topics);
+            const hasExam = levelId === userData.currentLevel && levelData.exam && levelData.exam.questions.length > 0;
+
+            const t = {
+                es: { finalExam: 'Examen Final', testKnowledge: 'Prueba tus Conocimientos', testInstructions: 'Este es el examen final del nivel. ¡Demuestra lo que has aprendido!', startExam: 'Comenzar Examen de Nivel' },
+                en: { finalExam: 'Final Exam', testKnowledge: 'Test Your Knowledge', testInstructions: 'This is the final exam for the level. Show what you\'ve learned!', startExam: 'Start Level Exam' }
+            };
+
+            let tabsHtml = `<div class="px-4 md:px-6 border-b border-gray-200 mb-4 flex flex-wrap bg-white">`;
+            categories.forEach((category, index) => {
+                let categoryName = category.replace('_', ' ');
+                tabsHtml += `<button class="tab-btn capitalize py-3 px-2 md:px-4 text-sm md:text-base ${index === 0 ? 'active' : ''}" data-target="tab-${category}">${categoryName}</button>`;
+            });
+            if (hasExam) {
+                tabsHtml += `<button class="tab-btn capitalize py-3 px-2 md:px-4 text-sm md:text-base" data-target="tab-examen">${t[lang].finalExam}</button>`;
+            }
+            tabsHtml += '</div>';
+
+            let contentHtml = '';
+            categories.forEach((category, index) => {
+                const topics = levelData.topics[category];
+                contentHtml += `<div id="tab-${category}" class="tab-content ${index > 0 ? 'hidden' : ''}"><div class="space-y-3">`;
+                topics.forEach((topic) => {
+                    contentHtml += `
+                        <details class="bg-white p-0 rounded-lg group shadow-sm">
+                            <summary class="font-semibold cursor-pointer list-none">${topic}</summary>
+                            <div class="p-4 border-t pt-3 space-y-4">
+                                <div class="ai-explanation-container p-4 ai-container" style="display: none;"></div>
+                                <div class="ai-exercise-container p-4 ai-container" style="display: none;"></div>
+                                <div class="flex flex-wrap gap-2">
+                                     <button class="generate-ai-explanation-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Explicación' : 'Explanation'}</button>
+                                     <button class="generate-ai-exercise-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm rounded-md transition duration-300 flex items-center gap-2" data-level="${levelId}" data-topic="${topic}" data-category="${category}" data-lang="${lang}"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> ${lang === 'es' ? 'Práctica' : 'Practice'}</button>
+                                </div>
+                            </div>
+                        </details>`;
+                });
+                contentHtml += '</div></div>';
+            });
+             if (hasExam) {
+                contentHtml += `<div id="tab-examen" class="tab-content hidden text-center p-4 md:p-8 bg-white rounded-lg shadow-inner">
+                    <h3 class="text-2xl font-bold mb-4">${t[lang].testKnowledge}</h3>
+                    <p class="text-gray-600 mb-6">${t[lang].testInstructions}</p>
+                    <button id="start-exam-btn" data-level="${levelId}" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-lg">${t[lang].startExam}</button>
+                </div>`;
+            }
+
+            modalContentArea.innerHTML = tabsHtml + contentHtml;
+            addModalEventListeners(levelId);
+            modal.classList.remove('hidden');
+        }
+        
+        function startExam(levelId) {
+            const examData = contentDB[levelId].exam;
+            const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
+            const title = lang === 'es' ? `Examen Nivel ${levelId}` : `Level ${levelId} Exam`;
+            
+            let examHtml = `<div class="text-left bg-white p-6 rounded-lg shadow-lg"><h3 class="text-2xl font-bold mb-6 text-center">${examData.title || title}</h3><div id="exam-form" class="space-y-6">`;
+            examData.questions.forEach((q, index) => {
+                examHtml += `
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <p class="font-semibold mb-3 text-slate-800">${index + 1}. ${q.q}</p>
+                        <div class="space-y-2">`;
+                q.options.forEach(opt => {
+                    examHtml += `
+                        <div><label class="flex items-center cursor-pointer p-2 rounded-md hover:bg-slate-100 transition">
+                            <input type="radio" name="q${index}" value="${opt}" class="mr-3"><span class="text-slate-700">${opt}</span>
+                        </label></div>`;
+                });
+                examHtml += `</div></div>`;
+            });
+            examHtml += `<button id="submit-exam-btn" data-level="${levelId}" class="w-full mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg text-lg">${lang === 'es' ? 'Entregar Examen' : 'Submit Exam'}</button>`;
+            examHtml += `</div></div>`;
+            
+            modalContentArea.innerHTML = examHtml;
+            document.getElementById('submit-exam-btn').addEventListener('click', (e) => submitExam(e.target.dataset.level));
+        }
+
+        function submitExam(levelId) {
+            const examData = contentDB[levelId].exam;
+            let score = 0;
+            examData.questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && selected.value === q.a) {
+                    score++;
+                }
+            });
+
+            const lang = ['A1', 'A2'].includes(levelId) ? 'es' : 'en';
+            const t = {
+                es: { pass: "¡Felicidades! ¡Nivel Superado!", fail: "Necesitas practicar más", score: `Has obtenido ${score} de ${examData.questions.length} respuestas correctas.`, passNext: `¡Has desbloqueado el nivel`, failReq: `Necesitas al menos ${examData.passScore} para pasar.`, failAdvice: "¡No te rindas! Repasa el material y vuelve a intentarlo.", continue: "Continuar", retry: "Volver a Estudiar", mastery: "¡MAESTRÍA COMPLETA!", masteryDesc: "¡Has completado todos los niveles! Eres un maestro del inglés.", toDashboard: "Volver al Panel", report: "Ver Reporte de Desempeño", downloadCert: "Descargar Certificado" },
+                en: { pass: "Congratulations! Level Cleared!", fail: "You need more practice", score: `You got ${score} out of ${examData.questions.length} correct.`, passNext: `You have unlocked level`, failReq: `You need at least ${examData.passScore} to pass.`, failAdvice: "Don't give up! Review the material and try again.", continue: "Continue", retry: "Study Again", mastery: "MASTERY COMPLETE!", masteryDesc: "You have completed all levels! You are an English master.", toDashboard: "Back to Dashboard", report: "View Performance Report", downloadCert: "Download Certificate" }
+            };
+
+            let resultHtml;
+            if (score >= examData.passScore) {
+                const allLevels = Object.keys(contentDB);
+                const currentIndex = allLevels.indexOf(levelId);
+                const nextLevelId = allLevels[currentIndex + 1];
+
+                if (nextLevelId) {
+                    userData.currentLevel = nextLevelId;
+                    if (!userData.unlockedLevels.includes(nextLevelId)) {
+                        userData.unlockedLevels.push(nextLevelId);
+                    }
+                    resultHtml = `<div class="text-center p-6"><h3 class="text-2xl font-bold text-green-500 mb-4">${t[lang].pass}</h3><p class="text-lg mb-4">${t[lang].score}</p><p class="text-lg font-semibold">${t[lang].passNext} ${nextLevelId}!</p>
+                    <div class="my-6"><canvas id="performanceChart"></canvas></div>
+                    <button id="download-cert-btn" data-level="${levelId}" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].downloadCert}</button>
+                    <button id="continue-btn" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].continue}</button></div>`;
+                } else {
+                     resultHtml = `<div class="text-center p-6"><h3 class="text-2xl font-bold text-green-500 mb-4">${t[lang].mastery}</h3><p class="text-lg mb-4">${t[lang].masteryDesc}</p>
+                     <div class="my-6"><canvas id="performanceChart"></canvas></div>
+                     <button id="download-cert-btn" data-level="${levelId}" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].downloadCert}</button>
+                     <button id="continue-btn" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].toDashboard}</button></div>`;
+                }
+                saveUserData();
+            } else {
+                resultHtml = `<div class="text-center p-6"><h3 class="text-2xl font-bold text-red-500 mb-4">${t[lang].fail}</h3><p class="text-lg mb-4">${t[lang].score} ${t[lang].failReq}</p><p class="text-lg">${t[lang].failAdvice}</p><button id="retry-btn" data-level="${levelId}" class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">${t[lang].retry}</button></div>`;
+            }
+            modalContentArea.innerHTML = resultHtml;
+            
+            if (score >= examData.passScore) {
+                renderPerformanceChart(levelId, score, examData.questions.length);
+                document.getElementById('download-cert-btn').addEventListener('click', (e) => downloadCertificate(e.target.dataset.level));
+            }
+
+            if(document.getElementById('continue-btn')) {
+                document.getElementById('continue-btn').addEventListener('click', () => { closeModal(); renderDashboard(); });
+            }
+            if(document.getElementById('retry-btn')) {
+                document.getElementById('retry-btn').addEventListener('click', (e) => openLevelModal(e.target.dataset.level));
+            }
+        }
+
+        function renderPerformanceChart(levelId, userScore, totalQuestions) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const overallPercentage = (userScore / totalQuestions) * 100;
+            
+            // Dummy data for breakdown - in a real app this would be calculated
+            const grammarScore = Math.random() * 90 + 10;
+            const vocabScore = Math.random() * 90 + 10;
+            const skillsScore = Math.random() * 90 + 10;
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Overall', 'Grammar', 'Vocabulary', 'Skills'],
+                    datasets: [{
+                        label: 'Your Performance',
+                        data: [overallPercentage, grammarScore, vocabScore, skillsScore],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(54, 162, 235)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: { display: false },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            pointLabels: { font: { size: 14 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function downloadCertificate(levelId) {
+            const doc = new jsPDF();
+            const levelData = contentDB[levelId];
+            const date = new Date().toLocaleDateString();
+
+            doc.setFontSize(30);
+            doc.setFont("helvetica", "bold");
+            doc.text("Certificate of Achievement", 105, 40, null, null, "center");
+            
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "normal");
+            doc.text("This is to certify that", 105, 70, null, null, "center");
+
+            doc.setFontSize(26);
+            doc.setFont("helvetica", "bold");
+            doc.text(userData.name, 105, 90, null, null, "center");
+
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "normal");
+            doc.text("has successfully completed the level", 105, 110, null, null, "center");
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text(levelData.title, 105, 130, null, null, "center");
+
+            doc.setFontSize(14);
+            doc.text(`on ${date}`, 105, 150, null, null, "center");
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "italic");
+            doc.text("English4U by Teacher V", 105, 180, null, null, "center");
+
+            doc.save(`English4U_Certificate_${levelId}.pdf`);
+        }
+
+
+        async function generateAiContent(button, prompt, container, isInteractive = false) {
+             container.style.display = 'block';
+             container.innerHTML = `<div class="flex items-center justify-center p-4"><div class="spinner w-6 h-6 rounded-full border-4 border-gray-200"></div><p class="ml-3 text-sm text-gray-500">Generating with AI...</p></div>`;
+             button.disabled = true;
+             button.classList.add('opacity-50');
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                
+                if (isInteractive) {
+                    payload.generationConfig = {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                exercises: {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            type: { "type": "STRING" },
+                                            question: { type: "STRING" },
+                                            options: { type: "ARRAY", items: { type: "STRING" } },
+                                            answer: { type: "STRING" }
+                                        },
+                                        required: ["type", "question", "answer"]
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
+
+                const apiKey = ""; // Provided by environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const contentPart = result.candidates[0].content.parts[0];
+                    if (isInteractive) {
+                        const exerciseData = JSON.parse(contentPart.text);
+                        renderInteractiveExercise(container, exerciseData.exercises, button.dataset.lang, button.dataset.category);
+                    } else {
+                        container.innerHTML = contentPart.text;
+                    }
+                } else {
+                    throw new Error("No content received from API.");
+                }
+
+            } catch (error) {
+                console.error("Error fetching from Gemini API:", error);
+                container.innerHTML = `<p class="text-red-500 text-sm p-4">Sorry, content could not be generated. Please try again later.</p>`;
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-50');
+            }
+        }
+
+        function renderInteractiveExercise(container, exercises, lang, category) {
+            const t = {
+                es: { title: "Misión de Práctica", check: "Revisar Respuestas" },
+                en: { title: "Practice Mission", check: "Check Answers" }
+            };
+            let exerciseHtml = `<h3><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> ${t[lang].title}</h3><form class="interactive-exercise-form space-y-4 mt-2">`;
+            
+            if (category === 'proofreading') {
+                const text = exercises[0].question;
+                const words = text.split(' ');
+                exerciseHtml += `<p class="text-lg leading-relaxed bg-slate-50 p-4 rounded-md">`;
+                words.forEach((word, index) => {
+                    exerciseHtml += `<span class="proofreading-word" data-word-index="${index}">${word}</span> `;
+                });
+                exerciseHtml += `</p><input type="hidden" id="proofreading-answers" value="${exercises[0].answer}">`;
+            } else {
+                exercises.forEach((ex, index) => {
+                    exerciseHtml += `<div class="exercise-question p-3 rounded-lg border border-slate-200 bg-slate-50" data-answer="${ex.answer}" data-type="${ex.type}">
+                        <p class="font-semibold mb-2 text-slate-800">${index + 1}. ${ex.question.replace('___', '<span class="font-bold text-blue-600">[BLANK]</span>')}</p>`;
+                    
+                    if (ex.type === 'multiple-choice') {
+                        exerciseHtml += `<div class="space-y-1">`;
+                        ex.options.forEach(opt => {
+                            exerciseHtml += `
+                                <label class="block p-2 rounded-md border border-gray-200 cursor-pointer hover:bg-gray-100 bg-white">
+                                    <input type="radio" name="ex-q${index}" value="${opt}" class="mr-2">
+                                    <span>${opt}</span>
+                                </label>`;
+                        });
+                        exerciseHtml += `</div>`;
+                    } else if (ex.type === 'fill-in-the-blank') {
+                        exerciseHtml += `<input type="text" name="ex-q${index}" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" placeholder="${lang === 'es' ? 'Escribe tu respuesta...' : 'Type your answer...'}">`;
+                    }
+                    exerciseHtml += `</div>`;
+                });
+            }
+            exerciseHtml += `<button type="submit" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md">${t[lang].check}</button></form>`;
+            container.innerHTML = exerciseHtml;
+
+            container.querySelector('.interactive-exercise-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                checkInteractiveExercise(e.target);
+            });
+            
+            if (category === 'proofreading') {
+                container.querySelectorAll('.proofreading-word').forEach(wordEl => {
+                    wordEl.addEventListener('click', () => wordEl.classList.toggle('selected'));
+                });
+            }
+        }
+
+        function checkInteractiveExercise(form) {
+            const questions = form.querySelectorAll('.exercise-question');
+            if (questions.length > 0) { // Standard exercises
+                questions.forEach(qDiv => {
+                    const correctAnswer = qDiv.dataset.answer.toLowerCase();
+                    const type = qDiv.dataset.type;
+
+                    if (type === 'multiple-choice') {
+                        const selectedRadio = qDiv.querySelector('input[type="radio"]:checked');
+                        const labels = qDiv.querySelectorAll('label');
+                        labels.forEach(label => {
+                            label.classList.remove('correct-answer', 'incorrect-answer');
+                            const radio = label.querySelector('input');
+                            if (radio.value.toLowerCase() === correctAnswer) {
+                                label.classList.add('correct-answer');
+                            }
+                        });
+                        if (selectedRadio && selectedRadio.value.toLowerCase() !== correctAnswer) {
+                            selectedRadio.parentElement.classList.add('incorrect-answer');
+                        }
+                    } else if (type === 'fill-in-the-blank') {
+                        const input = qDiv.querySelector('input[type="text"]');
+                        input.classList.remove('fill-in-correct', 'fill-in-incorrect');
+                        if (input.value.trim().toLowerCase() === correctAnswer) {
+                            input.classList.add('fill-in-correct');
+                        } else {
+                            input.classList.add('fill-in-incorrect');
+                        }
+                    }
+                });
+            } else { // Proofreading exercise
+                const answerInput = form.querySelector('#proofreading-answers');
+                const correctIndices = answerInput.value.split(',').map(Number);
+                const words = form.querySelectorAll('.proofreading-word');
+                words.forEach((wordEl, index) => {
+                    wordEl.classList.remove('correct-answer', 'incorrect-answer');
+                    const isCorrectError = correctIndices.includes(index);
+                    const isSelected = wordEl.classList.contains('selected');
+
+                    if (isCorrectError && isSelected) {
+                        wordEl.classList.add('correct-answer');
+                    } else if (!isCorrectError && isSelected) {
+                        wordEl.classList.add('incorrect-answer');
+                    } else if (isCorrectError && !isSelected) {
+                        wordEl.classList.add('incorrect-answer'); // Highlight missed errors
+                    }
+                });
+            }
+        }
+
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        // --- EVENT LISTENERS ---
+        function addLevelCardListeners() {
+            document.querySelectorAll('.level-card').forEach(card => {
+                if (!card.classList.contains('locked')) {
+                    card.addEventListener('click', () => openLevelModal(card.id.split('-')[1]));
+                }
+            });
+        }
+
+        function addModalEventListeners(levelId) {
+            document.querySelectorAll('.generate-ai-explanation-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const { topic, lang, category } = e.target.dataset;
+                    const container = e.target.closest('.p-4').querySelector('.ai-explanation-container');
+                    const prompt = `As a fun and encouraging game guide for an English learner (level ${levelId}), create a detailed explanation for the topic "${topic}" within the category "${category}". Use a gamified tone. For example: "Power-up your skills! Let's unlock the '${topic}' ability." Explain the main rule, provide several use cases with examples, and a 'Common Traps' section for frequent mistakes. The entire response must be in ${lang}. Format it beautifully in HTML using <h3>, <p>, <strong>, <ul>, <li>.`;
+                    generateAiContent(e.target, prompt, container, false);
+                });
+            });
+
+            document.querySelectorAll('.generate-ai-exercise-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const { topic, lang, category } = e.target.dataset;
+                    const container = e.target.closest('.p-4').querySelector('.ai-exercise-container');
+                    let prompt;
+                    if (category === 'proofreading') {
+                        prompt = `Create a fun, gamified proofreading mission for an English learner (level ${levelId}). Provide a short paragraph (3-4 sentences) that contains 3-5 subtle errors appropriate for the level (e.g., wrong tense, incorrect preposition, subject-verb agreement). The response should only be a JSON object with one key "exercises", which is an array with a single object. This object should have "type": "proofreading", "question": "The full text with errors.", and "answer": "A comma-separated string of the 0-based indices of the incorrect words.". The entire response must be in ${lang}.`;
+                    } else {
+                        prompt = `Create a fun, gamified practice mission of at least 15-20 questions for an English learner (level ${levelId}) on "${topic}". Include a mix of 'multiple-choice' and 'fill-in-the-blank' questions. For fill-in-the-blank, use "___" in the question text. The entire response must be in ${lang}.`;
+                    }
+                    generateAiContent(e.target, prompt, container, true);
+                });
+            });
+
+            const startExamBtn = document.getElementById('start-exam-btn');
+            if(startExamBtn) {
+                startExamBtn.addEventListener('click', (e) => startExam(e.target.dataset.level));
+            }
+
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const targetId = tab.dataset.target;
+                    tabContents.forEach(content => {
+                        content.id === targetId ? content.classList.remove('hidden') : content.classList.add('hidden');
+                    });
+                });
+            });
+        }
+        
+        startBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            if (name) {
+                userData.name = name;
+                await saveUserData();
+                showPlacementChoice();
+            } else {
+                nameInput.classList.add('border-red-500', 'ring-red-500');
+                setTimeout(() => nameInput.classList.remove('border-red-500', 'ring-red-500'), 2000);
+            }
+        });
+        
+        startFromBeginningBtn.addEventListener('click', async () => {
+            userData.currentLevel = 'A1';
+            userData.unlockedLevels = ['A1'];
+            userData.placementTestTaken = true;
+            await saveUserData();
+            showDashboard();
+        });
+
+        takePlacementTestBtn.addEventListener('click', startPlacementTest);
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        initializeAppAndAuth();
+    </script>
+</body>
+</html>
