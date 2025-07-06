@@ -315,38 +315,62 @@
         
         // --- EXPANDED CONTENT DATABASE ---
         const contentDB = {
-            'A1': {
-                title: 'A1: Beginner', color: 'bg-teal-500', description: 'Learn the basics to communicate.', xpToComplete: 1000,
-                topics: { Grammar: ["Verb to be", "Simple Present", "Articles"], Vocabulary: ["Greetings", "Numbers", "Family"], Proofreading: ["Common A1 Errors"], Phrasal_Verbs: ["Basic Phrasal Verbs"], Native_Expressions: ["Everyday Expressions"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options: ['am', 'is', 'are'], a: 'is' }) }
-            },
-            'A2': {
-                title: 'A2: Elementary', color: 'bg-blue-500', description: 'Describe your environment and experiences.', xpToComplete: 1500,
-                topics: { Grammar: ["Simple Past", "Present Continuous", "Future with 'going to'"], Vocabulary: ["Daily Routines", "Hobbies", "Travel"], Proofreading: ["Identifying wrong tenses"], Phrasal_Verbs: ["Verbs with 'get' & 'go'"], Native_Expressions: ["Phrases for socializing"] },
-                exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
-            },
-            'B1': {
-                title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence and express opinions.', xpToComplete: 2000,
-                topics: { Grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"], Vocabulary: ["Work", "Education", "Health"], Writing_Lab: ["Writing an informal email"], Proofreading: ["Punctuation and prepositions"], Phrasal_Verbs: ["Verbs for travel and work"], Native_Expressions: ["Common idioms"] },
-                exam: { passScore: 28, questions: [] }
-            },
-            'B2': {
-                title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate with fluency and spontaneity.', xpToComplete: 2500,
-                topics: { Grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"], Vocabulary: ["News", "Business", "Idioms"], Writing_Lab: ["Writing a for and against essay"], Proofreading: ["Complex sentence structure"], Phrasal_Verbs: ["Verbs for formal contexts"], Native_Expressions: ["Nuanced expressions"] },
-                exam: { passScore: 28, questions: [] }
-            },
-            'C1': {
-                title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in complex contexts.', xpToComplete: 3000,
-                topics: { Grammar: ["Inversions", "Participle Clauses", "Subjunctive"], Vocabulary: ["Academic Language", "Advanced Idioms", "Nuances"], Writing_Lab: ["Writing a report"], Proofreading: ["Register and tone"], Phrasal_Verbs: ["Less common phrasal verbs"], Native_Expressions: ["Colloquialisms"] },
-                exam: { passScore: 28, questions: [] }
-            },
-            'C2': {
-                title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the precision of a native.', xpToComplete: 4000,
-                topics: { Grammar: ["Advanced structures", "Stylistics"], Vocabulary: ["Specialized vocabulary", "Wordplay"], Writing_Lab: ["Writing a proposal"], Proofreading: ["Stylistic choices"], Phrasal_Verbs: ["Obscure phrasal verbs"], Native_Expressions: ["Cultural references"] },
-                exam: { passScore: 28, questions: [] }
-            }
-        };
-        
+    2         'A1': {
+    3             title: 'A1: Beginner', color: 'bg-teal-500', description: 'Learn the basics to
+      communicate.', xpToComplete: 1000,
+    4             topics: { Grammar: ["Verb to be", "Simple Present", "Articles"], Vocabulary: [
+      "Greetings", "Numbers", "Family"], Proofreading: ["Common A1 Errors"], Phrasal_Verbs: ["Basic
+      Phrasal Verbs"], Native_Expressions: ["Everyday Expressions"] },
+    5             exam: { passScore: 28, questions: Array(35).fill({ q: 'She ___ a doctor.', options:
+      ['am', 'is', 'are'], a: 'is' }) }
+    6         },
+    7         'A2': {
+    8             title: 'A2: Elementary', color: 'bg-blue-500', description: 'Describe your
+      environment and experiences.', xpToComplete: 1500,
+    9             topics: { Grammar: ["Simple Past", "Present Continuous", "Future with 'going to'"],
+      Vocabulary: ["Daily Routines", "Hobbies", "Travel"], Proofreading: ["Identifying wrong tenses"
+      ], Phrasal_Verbs: ["Verbs with 'get' & 'go'"], Native_Expressions: ["Phrases for socializing"]
+      },
+   10             exam: { passScore: 28, questions: Array(35).fill({ q: 'I ___ to the cinema
+      yesterday.', options: ['go', 'goed', 'went'], a: 'went' }) }
+   11         },
+   12         'B1': {
+   13             title: 'B1: Intermediate', color: 'bg-indigo-500', description: 'Gain independence
+      and express opinions.', xpToComplete: 2000,
+   14             topics: { Grammar: ["Present Perfect", "Conditionals (1, 2)", "Passive Voice"],
+      Vocabulary: ["Work", "Education", "Health"], Writing_Lab: ["Writing an informal email"],
+      Proofreading: ["Punctuation and prepositions"], Phrasal_Verbs: ["Verbs for travel and work"],
+      Native_Expressions: ["Common idioms"] },
+   15             exam: { passScore: 28, questions: [] }
+   16         },
+   17         'B2': {
+   18             title: 'B2: Upper-Intermediate', color: 'bg-purple-500', description: 'Communicate
+      with fluency and spontaneity.', xpToComplete: 2500,
+   19             topics: { Grammar: ["Perfect Tenses", "Conditionals (3, Mixed)", "Advanced Modals"
+      ], Vocabulary: ["News", "Business", "Idioms"], Writing_Lab: ["Writing a for and against essay"
+      ], Proofreading: ["Complex sentence structure"], Phrasal_Verbs: ["Verbs for formal contexts"],
+      Native_Expressions: ["Nuanced expressions"] },
+   20             exam: { passScore: 28, questions: [] }
+   21         },
+   22         'C1': {
+   23             title: 'C1: Advanced', color: 'bg-pink-500', description: 'Master the language in
+      complex contexts.', xpToComplete: 3000,
+   24             topics: { Grammar: ["Inversions", "Participle Clauses", "Subjunctive"], Vocabulary:
+      ["Academic Language", "Advanced Idioms", "Nuances"], Writing_Lab: ["Writing a report"],
+      Proofreading: ["Register and tone"], Phrasal_Verbs: ["Less common phrasal verbs"], Native
+      _Expressions: ["Colloquialisms"] },
+   25             exam: { passScore: 28, questions: [] }
+   26         },
+   27         'C2': {
+   28             title: 'C2: Mastery', color: 'bg-red-500', description: 'Express yourself with the
+      precision of a native.', xpToComplete: 4000,
+   29             topics: { Grammar: ["Advanced structures", "Stylistics"], Vocabulary: ["Specialized
+      vocabulary", "Wordplay"], Writing_Lab: ["Writing a proposal"], Proofreading: ["Stylistic
+      choices"], Phrasal_Verbs: ["Obscure phrasal verbs"], Native_Expressions: ["Cultural references"
+      ] },
+   30             exam: { passScore: 28, questions: [] }
+   31         }
+   32     };
         const placementTestQuestions = [
             // A2 Level
             { q: 'He didn't ___ to the party last night.', options: ['go', 'went', 'gone'], a: 'go' },
